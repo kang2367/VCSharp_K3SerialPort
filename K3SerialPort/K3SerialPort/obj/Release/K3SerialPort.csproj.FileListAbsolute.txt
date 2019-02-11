@@ -1,0 +1,10 @@
+D:\kgkang\Src\VCSharp\VCSharp2015_K3SerialPort\K3SerialPort\K3SerialPort\bin\Release\K3SerialPort.exe.config
+D:\kgkang\Src\VCSharp\VCSharp2015_K3SerialPort\K3SerialPort\K3SerialPort\bin\Release\K3SerialPort.exe
+D:\kgkang\Src\VCSharp\VCSharp2015_K3SerialPort\K3SerialPort\K3SerialPort\bin\Release\K3SerialPort.pdb
+D:\kgkang\Src\VCSharp\VCSharp2015_K3SerialPort\K3SerialPort\K3SerialPort\obj\Release\K3SerialPort.FormMain.resources
+D:\kgkang\Src\VCSharp\VCSharp2015_K3SerialPort\K3SerialPort\K3SerialPort\obj\Release\K3SerialPort.Properties.Resources.resources
+D:\kgkang\Src\VCSharp\VCSharp2015_K3SerialPort\K3SerialPort\K3SerialPort\obj\Release\K3SerialPort.csproj.GenerateResource.Cache
+D:\kgkang\Src\VCSharp\VCSharp2015_K3SerialPort\K3SerialPort\K3SerialPort\obj\Release\K3SerialPort.csproj.CoreCompileInputs.cache
+D:\kgkang\Src\VCSharp\VCSharp2015_K3SerialPort\K3SerialPort\K3SerialPort\obj\Release\K3SerialPort.exe
+D:\kgkang\Src\VCSharp\VCSharp2015_K3SerialPort\K3SerialPort\K3SerialPort\obj\Release\K3SerialPort.pdb
+D:\kgkang\Src\VCSharp\VCSharp2015_K3SerialPort\K3SerialPort\K3SerialPort\obj\Release\K3SerialPort.csprojResolveAssemblyReference.cache

@@ -1,0 +1,1893 @@
+<C# Tip & Note>
+
+
+- 배열 초기화 
+    public static byte[] DataBuff;
+
+    public FormMain()
+    {
+        InitializeComponent();
+        DataBuff = new byte[1024];
+        DataBuff[0] = 0xff;
+        System.Array.Clear(DataBuff, 0, DataBuff.Length);
+    }
+
+
+- Log 
+	string strTime = System.DateTime.Now.ToString("[HH:mm:ss]");
+	if(cSystem.giLanguage == 1)
+		cTxt_LogEventData.AppendText(strTime + "그룹 데이터 수량은 2개 이상이어야 합니다!" + Environment.NewLine);
+
+		
+- 원의 해치(Hatch)
+	수평 0도
+		원의 방정식과 y = a1의 상수 값을 이용한 교차점을 구하여 line 생성.
+
+		
+- 원의 방정식 
+	원의 중심이 (a, b)이고 반지름이 r인 경우 
+	(x-a)^2 + (y-b)^2 = r^2
+
+	
+- Arc start angle 계산.
+	dStartAngle = Math.Atan2((double)(cSystem.pointArcSecond.Y - cSystem.pointArcFirst.Y), (double)(cSystem.pointArcSecond.X - cSystem.pointArcFirst.X));   // radian (PI base)
+	dStartAngle = dStartAngle * 180.0 / Math.PI;      // Radian to Degree
+	if (dStartAngle < 0)
+		dStartAngle = (180.0 + dStartAngle) + 180.0;
+
+	
+-	EventHandler 등록 & 해제 (Sorted)
+	http://mclee.tistory.com/49
+		Event handler 추가 및 삭제.
+
+		this.textBoxDimOutlineDimX.TextChanged -= new System.EventHandler(this.textBoxDimOutlineDimX_TextChanged);
+		this.textBoxDimOutlineDimY.TextChanged -= new System.EventHandler(this.textBoxDimOutlineDimY_TextChanged);
+
+		textBoxDimOutlineDimX.Text = Math.Abs(fStartX - fEndX).ToString("F3");
+		textBoxDimOutlineDimY.Text = Math.Abs(fStartY - fEndY).ToString("F3");
+
+		this.textBoxDimOutlineDimX.TextChanged += new System.EventHandler(this.textBoxDimOutlineDimX_TextChanged);
+		this.textBoxDimOutlineDimY.TextChanged += new System.EventHandler(this.textBoxDimOutlineDimY_TextChanged);
+
+		이렇게 써서 임시로 막을 수도 있다.
+
+- 파일명 추출 (Sorted)
+	http://mainia.tistory.com/2349
+		파일명 추출 
+		tabPageViewNew.Text = Path.GetFileName(saveFileDialog.FileName);
+		
+		
+- DataGridView의 마지막 index 찾기 (Sorted)
+    cGrid_Entity.Sort(cGrid_Entity.Columns[0], ListSortDirection.Ascending);
+
+    int iStart = 1;
+
+    if(cGrid_Entity.RowCount > 1)
+        iStart = (int)(cGrid_Entity.Rows[cGrid_Entity.RowCount - 2].Cells[0].Value) + 1;  // Get Entity index number start position            
+
+	참고) 현재 index 찾기.
+		intCurrentRow = DataGridView.RowCount - 1
+		// RowCount는 1부터 시작한다. 
+		
+		
+- DataGridView (Selected Entity) (Sorted)
+	Selected Entity 선택된 정순서대로 표시 .
+    //    strNum = cGrid_Entity.SelectedRows[(cGrid_Entity.SelectedRows.Count - 1) - i].Cells[0].Value.ToString();
+    //    strObject = cGrid_Entity.SelectedRows[(cGrid_Entity.SelectedRows.Count - 1) - i].Cells[1].Value.ToString();
+    //    strParam = cGrid_Entity.SelectedRows[(cGrid_Entity.SelectedRows.Count - 1) - i].Cells[2].Value.ToString();
+
+	
+- 단축키 (Short key, ShortKey) (Sorted)
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            //Keys key = keyData & ~(Keys.Shift | Keys.Control);    // Ctrl, Shift key unmask
+            Keys key = keyData & ~Keys.Shift;
+
+            switch (key)
+            {
+                case Keys.Escape:               // Mode skip
+                    if (cSystem.iLineClickStep > 0)
+                        cSystem.iLineClickStep = 0;
+                    if (cSystem.iCircleClickStep > 0)
+                        cSystem.iCircleClickStep = 0;
+                    if (cSystem.iRectangleClickStep > 0)
+                        cSystem.iRectangleClickStep = 0;
+                    if (cSystem.iArcClickStep > 0)
+                        cSystem.iArcClickStep = 0;
+                    if (cSystem.iSelectClickStep > 0)
+                        cSystem.iSelectClickStep = 0;
+                    if (cSystem.giEntityMove > 0)
+                    {
+                        cSystem.giEntityMove = 0;
+                        ctxMenuItemMove_Click(null, null);
+                        //ctxMenuItemMove.Checked = false;
+                    }
+                    GridEntitytoDisplay();
+                    GridEntitySelectedDisplay();
+                    //return true;
+                    break;
+
+                case Keys.F2:               // Mark start
+                    if (cGrid_Entity.Focused)
+                    {
+                        Console.WriteLine("Grid entity focused!");
+
+                        cGrid_Entity.BeginEdit(true);
+
+                        return true;    //break;
+                    }
+
+                    if(cTabControlProperty.SelectedIndex == 0)              // RTC tab
+                    {
+                        btn_RTC_Mark_Click(btn_RTC_Mark, null);
+   
+                        return true;
+                    }
+                    else if (cTabControlProperty.SelectedIndex == 1)        // ISE tab
+                    {
+                        btn_ISE_Mark_Click(btn_ISE_Mark, null);
+
+                        return true;
+                    }
+                    //MessageBox.Show("f2");
+                    break;
+
+                case Keys.F3:               // Mark stop
+                    if (cTabControlProperty.SelectedIndex == 0)              // RTC tab
+                    {
+                        btn_RTC_MarkStop_Click(btn_RTC_MarkStop, null);
+                        return true;
+                    }
+                    else if (cTabControlProperty.SelectedIndex == 1)        // ISE tab
+                    {
+                        btn_ISE_Stop_Click(btn_ISE_Stop, null);
+                        return true;
+                    }
+                    //MessageBox.Show("f3");
+                    break;
+
+                //case Keys.F5:
+                //    MessageBox.Show("f5");
+                //    return true;
+                //    break;
+
+                //case Keys.F:
+                //    if ((keyData & Keys.Control) != 0)
+                //    {
+                //        MessageBox.Show("Ctrl+F");
+                //        return true;
+                //    }
+                //    break;
+
+                //case Keys.F | Keys.Control:
+                //    MessageBox.Show("Ctrl+F");
+                //    break;
+
+                //case Keys.Left:
+                //    if ((keyData & Keys.Control) != 0)
+                //    {
+                //        GridEntityOffsetMove(true, false, true);
+                //        GridEntitySelectedDisplay();
+                //        return true;
+                //    }
+                //    break;
+
+                case Keys.Left | Keys.Control:	// 이와 같이 처리해야 제대로 적용된다. 이전에는 위의 방식으로 처리되었었는데 왜 변경되었는지는 의문이다.
+                    GridEntityOffsetMove(true, false, true);
+                    GridEntitySelectedDisplay();
+                    break;
+
+                //case Keys.Right:
+                //    if ((keyData & Keys.Control) != 0)
+                //    {
+                //        GridEntityOffsetMove(true, false, false);
+                //        GridEntitySelectedDisplay();
+                //        return true;
+                //    }
+                //    break;
+
+                case Keys.Right | Keys.Control:
+                    GridEntityOffsetMove(true, false, false);
+                    GridEntitySelectedDisplay();
+                    break;
+
+                //case Keys.Up:
+                //    if ((keyData & Keys.Control) != 0)
+                //    {
+                //        GridEntityOffsetMove(false, true, false);
+                //        GridEntitySelectedDisplay();
+                //        return true;
+                //    }
+                //    break;
+
+                case Keys.Up | Keys.Control:
+                    GridEntityOffsetMove(false, true, false);
+                    GridEntitySelectedDisplay();
+                    break;
+
+                //case Keys.Down:
+                //    if ((keyData & Keys.Control) != 0)
+                //    {
+                //        GridEntityOffsetMove(false, true, true);
+                //        GridEntitySelectedDisplay();
+                //        return true;
+                //    }
+                //    break;
+
+                case Keys.Down | Keys.Control:
+                    GridEntityOffsetMove(false, true, true);
+                    GridEntitySelectedDisplay();
+                    break;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+
+- Timer 
+	interval이 0보다 작으면 예외 에러 메시지 발생. 
+
+- 	DataGridView
+		RowCount에는 Enpty row도 포함되어 있다. 따라서 이것을 제외해야 한다.
+
+- DataGridView (Sorted)
+	cGrid_Entity.BeginEdit(true);	// 수정 모드 진입.
+
+- 좌표 회전 변환 (Sorted)
+	http://icodebroker.tistory.com/3189
+				
+	using System;
+	using System.Windows;
+	#region 좌표 회전하기 - Rotate(sourcePoint, centerPoint, rotateAngle)
+	/// <summary>
+	/// 좌표 회전하기
+	/// </summary>
+	/// <param name="sourcePoint">소스 좌표</param>
+	/// <param name="centerPoint">중심점 좌표</param>
+	/// <param name="rotateAngle">회전 각도</param>
+	/// <returns>회전 좌표</returns>
+	public Point Rotate(Point sourcePoint, Point centerPoint, double rotateAngle)
+	{
+		Point targetPoint = new Point();
+		double radian = rotateAngle / 180 * Math.PI;
+		targetPoint.X = Math.Cos(radian) * (sourcePoint.X - centerPoint.X) - Math.Sin(radian) * (sourcePoint.Y - centerPoint.Y) + centerPoint.X;
+		targetPoint.Y = Math.Sin(radian) * (sourcePoint.X - centerPoint.X) + Math.Cos(radian) * (sourcePoint.Y - centerPoint.Y) + centerPoint.Y; 
+		return targetPoint;
+	}
+	#endregion
+	출처: http://icodebroker.tistory.com/3189 [ICODEBROKER]			
+
+
+- 	DataGridView Sort (Sorted)
+		cGrid_Entity.Sort(cGrid_Entity.Columns[0], ListSortDirection.Ascending);
+		
+		
+- 없는 번호를 찾아서 추가하는 루틴 
+        // Check group number 
+        ArrayList arraylistGroupNum = new ArrayList();
+
+        for (int i = 0; i < cGrid_Entity.Rows.Count - 1; i++)
+        {
+            strObject = cGrid_Entity.Rows[i].Cells[1].Value.ToString();
+            if(strObject == "Group")
+            {
+                strParam = cGrid_Entity.Rows[i].Cells[2].Value.ToString();
+                string[] strParamValue = strParam.Split(new string[] { "," }, StringSplitOptions.None);
+                arraylistGroupNum.Add(int.Parse(strParamValue[0]));
+            }
+        }
+        arraylistGroupNum.Sort();
+
+        for (int i = 1; i <= (int)arraylistGroupNum[arraylistGroupNum.Count - 1]; i++)   // Until Max. value
+        {
+            if (arraylistGroupNum.Contains(i))
+                continue;
+            else
+            {
+                strGroupParam += (i.ToString() + ",");
+                break;
+            }
+        }
+        if(strGroupParam == "")
+            strGroupParam += (((int)arraylistGroupNum[arraylistGroupNum.Count - 1] + 1).ToString() + ",");
+
+
+- ArrayList (Sorted)
+	arraylist에서 특정값 검색 함수는? contains
+		if (arraylistGroupNum.Contains(i))
+			continue;
+
+
+- Xml entity 수정, 삭제, 추가 (Sorted)
+	if (strObject == "Group")
+	{
+		strNewNum = cGrid_Entity.Rows[iRowIndex - 1].Cells[0].Value.ToString();
+		SetEntityDataToXml("MarkerEntityData.xml", "Entity/" + strObject, int.Parse(strNum), strParam, int.Parse(strNewNum), strParam);
+	}
+	else
+	{
+		bResult = DeleteEntityNodeFromXml("MarkerEntityData.xml", "Entity/" + strObject, int.Parse(strNum), strParam);
+	
+		if (bResult)
+		{
+			strNum = cGrid_Entity.Rows[iRowIndex - 1].Cells[0].Value.ToString();
+			AddEntityNodeToXml("MarkerEntityData.xml", strObject, int.Parse(strNum), strParam);
+		}
+	}
+
+- 서식 지정자 format string (Sorted)
+	https://msdn.microsoft.com/ko-kr/library/dwhawy9k(v=vs.110).aspx
+	cSystem.formCtrlDimension.textBoxDimOutlineMaxX.Text = cSystem.fArcDimRightBottomX.ToString("F3");
+	// 소수점 3째 자리까지 표시.
+
+- ToString (Sorted)
+	cSystem.formCtrlDimension.textBoxDimOutlineMaxX.Text = cSystem.fArcDimRightBottomX.ToString("F3");	
+	
+- toString (Java?)
+	var num = new Number(10);
+	alert(num.toString()); // string, '10'
+	alert(num.toString(2)); // string, '1010', 2진수
+	alert(num.toString(8)); // string, '12', , 8진수
+	alert(num.toString(16)); // string, 'a', ' 16진수
+
+-	Help file link (Sorted)
+        private void contentsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //Help.ShowHelp(this, "DUWON_Marker.chm", HelpNavigator.TopicId, "1234");
+            Help.ShowHelp(this, "DUWON_Marker.chm");
+        }
+
+
+-	Cursor (Sorted)
+			[DllImport("user32.dll")]
+			private static extern IntPtr LoadCursorFromFile(String str);
+			private Cursor LoadCurserFromResource(byte[] curResorce)
+			{
+				Cursor result = null;
+				try
+				{
+					string path = Path.GetTempFileName();
+					File.WriteAllBytes(path, curResorce);
+					result = new Cursor(LoadCursorFromFile(path));
+					File.Delete(path);
+				}
+				catch
+				{
+					result = Cursors.Default;
+				}
+
+				return result;
+			}
+
+			pic_View.Cursor = LoadCurserFromResource(Properties.Resources.ArrowWithLine);
+
+-  Tooltip
+	도움말로 단축키를 표시하는 방법은?
+		http://www.csharpstudy.com/WinForms/WinForms-tooltip.aspx		
+			툴팁 컨트롤 사용.
+               toolTipsubSystemGeneral.SetToolTip(lblLanguage, "Language change needs to program restart.");
+               toolTipsubSystemGeneral.SetToolTip(comboBoxLanguage, "Language change needs to program restart.");
+
+
+- Ruler Control
+	MouseTrackingOn은 프로그램 실행할 때 활성화 하도록 한다.
+		-> 디자인 상태에서도 활성화 되어 있으면 디자인이 너무 느리게 진행된다.
+
+
+- 프로그램 폼 로드 구조. (VMT-100 source의 구조)
+	Screen을 별도로 만들고 System class에 등록한 뒤,
+	Main form에서 필요할 때마다 panel에 연결하여 사용하는 방식이다.
+	이렇게 구성하면 모든 폼을 메인에서 제어하기에 제어가 편리하다.
+
+	
+- Xml (Blog)
+	특정 노드에 하위노드를 추거하면서 값을 설정 (단, strNode는 존재해야 한다)
+        public bool AddNodeToXml(string strPath, string strNode, string strAddNode, string strParam)
+        {
+            // Save data to xml
+            try
+            {
+                XmlDocument doc = new XmlDocument();
+                doc.Load(strPath);
+
+                XmlNode addNode = doc.SelectSingleNode("/descendant::" + strNode);
+                XmlElement ElementObject = doc.CreateElement(strAddNode);      // Create node
+                ElementObject.InnerText = strParam;
+                addNode.AppendChild(ElementObject);
+
+                doc.Save(strPath);
+            }
+            catch
+            {
+                Console.WriteLine("Xml data write error!");
+                return false;
+            }
+            return true;
+        }
+
+	속성값 추가
+	  - image노드에 test노드를 추가해보자
+		XmlDocument doc = new XmlDocument();
+		doc.Load("xml경로");
+		XmlNode node = doc.SelectSingleNode("/descendant::basket/item/scene/image");
+		XmlAttributeCollection acxNode = node.Attributes;
+		XmlAttribute newAttr = doc.CreateAttribute("test");
+		newAttr.Value = "속성값";
+		acxNode.SetNamedItem(newAttr);
+		doc.Save("경로");
+
+		출처: http://using.tistory.com/15 [황군'story]		
+
+		Note) 자동으로 하위 노드를 찾으면서 없으면 생성하는 코드를 구현해야 한다.
+			-> 현재는 존재하는 노드 위치에 추가하는 구문만 구현한다. 
+
+	속성값 수정
+	  - image노드의 rc속성값을 변경해보자
+		XmlDocument doc = new XmlDocument();
+		doc.Load("xml경로");
+		XmlNode node = doc.SelectSingleNode("/descendant::basket/item/scene/image");
+		 XmlAttributeCollection acxNode = node.Attributes;
+		if(acxNode.GetNamedItem("rc") != null)
+		 {
+			  acxNode.GetNamedItem("rc").Value = "0 0";
+		 }
+		 doc.Save("경로");
+		출처: http://using.tistory.com/15 [황군'story]
+
+	InnerText
+		strParam = Nodeload.InnerText;	// 하위 노드의 텍스트를 모두 표시해 버린다. Parameter의 inner text만 표시해야 한다.
+		if(Nodeload.FirstChild.Name == "Param")
+			strParam = Nodeload.FirstChild.InnerText;
+
+	strParam = Nodeload.SelectNodes("Param")[0].InnerText;  	// Param으로 검색된 node 중 첫 번째 노드.
+		ex) 
+			<line>
+				<Param>1</Param>
+				<Param>2</Param>
+			</line>
+			<line>
+				<Param>1</Param>
+			</line>
+
+			
+- Xml (Sorted)
+	InnerText (Group)
+		<Line ID="1">
+		  <Param>-9.840,9.960,-8.520,-5.640</Param>
+		</Line>
+		
+	Nodeload.Name;	// Line 
+	Nodeload.InnerText;	//-9.840,9.960,-8.520,-5.640
+	Nodeload.InnerXml; // <Param>-9.840,9.960,-8.520,-5.640</Param>
+			
+			
+- Xml file make (Sorted)
+	using System.Xml.Linq;
+	
+    //----- XML write -----
+    XElement doc =
+        new XElement("DC3000",
+            new XElement("Tab", new XAttribute("ID", "Recorder"),
+                new XElement("Channel", "InpX"),
+                new XElement("Mode", "P-Edge")
+                )
+                );
+
+    doc.Save("MarkerCfg.xml");
+
+	<?xml version="1.0" encoding="utf-8"?>
+	<DC3000>
+	  <Tab ID="Recorder">
+		<Channel>InpX</Channel>
+		<Mode>P-Edge</Mode>
+	  </Tab>
+	</DC3000>	
+
+- Xml (Sorted)
+	XML node search
+		string strPath = "MarkerEntityData.xml";
+		string strNode = "Entity/Group";
+		XmlDocument XmlDocEntityDataLoad = new XmlDocument();
+		XmlDocEntityDataLoad.Load(strPath);
+		//XmlNode LoadrootNode = XmlDocEntityDataLoad.DocumentElement;	// Root node
+		XmlNodeList LoadNode = XmlDocEntityDataLoad.SelectNodes(strNode);
+		if (LoadNode.Count == 0)
+			return;
+
+	LoadEntityDataFromXml("MarkerEntityData.xml", cSystem.strMarkEntityDataPath, int.Parse(strNum));
+		// Path로 지정된 Entity 내에서 strNum이 ID인 항목을 찾고 그 하위의 노드를 표시한다.
+
+        private void LoadEntityDataFromXml(string strPath, string strNode, int iID) // Specific Node
+        {
+            XmlDocument XmlDocEntityDataLoad = new XmlDocument();
+            XmlDocEntityDataLoad.Load(strPath);
+            XmlNodeList LoadNode = XmlDocEntityDataLoad.SelectNodes(strNode);	// 찾은 노드 리스트.
+            if (LoadNode.Count == 0)
+                return;
+
+            string strNum, strObject, strParam;
+            int iNodeIndex = 0;
+
+            foreach (XmlNode Nodeload in LoadNode)		// 노드 리스트에서 특정 ID의 노드 번호를 찾는다.
+            {
+                strNum = Nodeload.Attributes["ID"].Value;
+                if (strNum == iID.ToString())
+                    break;
+                else
+                    iNodeIndex++;
+            }
+
+            LoadEntityDataFromNode(LoadNode[iNodeIndex]);
+        }
+
+	특정 노드 삭제
+		XmlDocument XmlDocEntityDataLoad = new XmlDocument();
+		XmlDocEntityDataLoad.Load("MarkerEntityData.xml");
+		XmlNodeList LoadNodeList;
+
+		for (int i = 0; i < cGrid_Entity.SelectedRows.Count; i++)
+		{
+			strNum = cGrid_Entity.SelectedRows[i].Cells[0].Value.ToString();
+			strObject = cGrid_Entity.SelectedRows[i].Cells[1].Value.ToString();
+			strParam = cGrid_Entity.SelectedRows[i].Cells[2].Value.ToString();
+
+			strNode += ("/" + strObject);
+			LoadNodeList = XmlDocEntityDataLoad.SelectNodes(strNode);
+			if (LoadNodeList.Count == 0)
+				continue;
+
+			int iNodeIndex = 0;
+
+			foreach (XmlNode Nodeload in LoadNodeList)
+			{
+				strXmlNodeNum = Nodeload.Attributes["ID"].Value;
+				if (strXmlNodeNum == strNum)
+					break;
+				else
+					iNodeIndex++;
+			}
+			XmlNode DeleteNode = LoadNodeList[iNodeIndex];
+			LoadNodeList[iNodeIndex].ParentNode.RemoveChild(DeleteNode);
+		}
+		XmlDocEntityDataLoad.Save("MarkerEntityData.xml");
+		
+- Xml
+	XML 내부의 내용 모두 삭제
+		http://blog.naver.com/PostView.nhn?blogId=suncsj&logNo=80116652706
+		root.RemoveAll()
+		
+		root.RemoveChild(root.FirstChild);
+		Console.WriteLine("Display the modified XML...");
+		doc.Save(Console.Out);
+			https://msdn.microsoft.com/ko-kr/library/system.xml.xmlnode.removechild(v=vs.110).aspx
+		
+	
+
+- 동적 Tab control 추가
+    if (!bManagerTab)
+    {
+        //this.cTabControlProperty.TabPages.Insert(lastIndex, "New Tab");
+        //this.cTabControlProperty.TabPages.Add("New Tab");
+        this.cTabControlProperty.TabPages.Add("DC3000");
+
+        lastIndex = this.cTabControlProperty.TabCount - 1;
+
+        this.cTabControlProperty.TabPages[lastIndex].BackColor = Color.White;
+        this.cTabControlProperty.SelectedIndex = lastIndex;
+        bManagerTab = true;
+
+        this.Invoke(new MethodInvoker(delegate ()
+        {
+            SubDC3000Form formSubDC3000 = new SubDC3000Form();
+            formSubDC3000.TopLevel = false;
+            formSubDC3000.TopMost = true;
+            formSubDC3000.Dock = DockStyle.Fill;
+
+            //Size sizecTabControlProperty = cTabControlProperty.Size;
+            //formSubDC3000.Size = new Size(sizecTabControlProperty.Width - 11, sizecTabControlProperty.Height - 29);
+
+            this.cTabControlProperty.TabPages[lastIndex].Controls.Add(formSubDC3000);
+            formSubDC3000.Show();
+
+        }));
+    }
+
+
+- 특정 Cell만 Edit mode로 진입
+	//cGrid_ISE_MarkParams.ReadOnly = true;
+	cGrid_ISE_MarkParams.Columns[0].ReadOnly = true;
+	cGrid_ISE_MarkParams.Columns[1].ReadOnly = false;
+	cGrid_ISE_MarkParams.Columns[2].ReadOnly = true;
+	cGrid_ISE_MarkParams.Columns[3].ReadOnly = true;
+	// 전체적으로 속성을 설정한 후 false로 해제하면 적용되지 않았다. 위와 같이 개별적으로 설정해 주어야 한다.
+
+
+- Toolbar image change
+	toolStripBtnHatch.Image = (gbTextHatch == true) ? Marker.Properties.Resources.Wand : Marker.Properties.Resources.Wand_Reverse;
+
+	
+- '?' operator (3항 연산)
+    gbTextHatch = (gbTextHatch == true) ? false : true;
+    toolStripBtnHatch.Image = (gbTextHatch == true) ? Marker.Properties.Resources.Wand : Marker.Properties.Resources.Wand_Reverse;
+
+
+- DrawBeziers 
+	반드시 3의 배수 + 1의 Point[]로 구성해야 한다.
+
+
+- Graphics Transform 
+	Graphics gpicView = this.pic_View.CreateGraphics();
+	gpicView.Clear(Color.White);
+	
+	//gpicView.MultiplyTransform(new Matrix(1, 0, 0, -1, 0, 501));
+	////gpicView.TranslateTransform(new Matrix(1, 0, 0, -1, 0, 0));
+	////gpicView.Transform = new Matrix(1, 0, 0, -1, 0, 500);
+	////gpicView.Transform = new Matrix(1, 0, 0, -1, 0, 501);
+	//gpicView.DrawImage(bitmap, 0, 0);
+	//gpicView.ResetTransform();
+
+
+- Bitmap rotate 
+	if (bitmap != null)
+	{
+		//bitmap.RotateFlip(RotateFlipType.Rotate180FlipY);
+		bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+	}
+
+
+- Text hatch 
+	Text의 영역을 pixel 단위로 scan 하여 첫 지점과 끝 지점을 Line으로 연결하는 알고리즘 구성.
+		-> 하나의 점만 있는 위치의 처리는? 
+			Solidbrush 사용.
+			연속된 색상의 픽셀을 라인으로 그리는 방식 적용.
+			
+
+- Outline Text 
+	GraphicsPath path;
+	path.AddString(pszbuf, wcslen(pszbuf), &fontFamily, 
+	FontStyleRegular, 48, Gdiplus::Point(10,10), &strformat );
+	DrawPath(Pen, path)
+	FillPath 
+
+	GraphicsPath
+		이 클래스에 Arc, Bezier, Curve, Elllipse, Line 등 다양한 경로를 추가할 수 있다.
+		추가된 path 정보를 얻을 수는 없는가?
+			속성 
+				PointCount
+				PathData	// Points
+				PathPoints 
+
+	using System.Drawing.Drawing2D;					
+    GraphicsPath p = new GraphicsPath();
+    p.AddString(
+        "My Text String",             // text to draw
+        FontFamily.GenericSansSerif,  // or any other font family
+        (int)FontStyle.Regular,      // font style (bold, italic, etc.)
+                                     //g.DpiY * fontSize / 72,       // em size
+        g.DpiY * 12 / 72,       // em size
+        new System.Drawing.Point(30, 30),              // location where to draw text
+        new StringFormat());          // set options here (e.g. center alignment)
+    g.DrawPath(Pens.Black, p);
+    // + g.FillPath if you want it filled as well					
+				
+	Text path (Text information)
+		path 정보를 console로 출력. -> 이 화면상의 좌표를 RTC 좌표로 표현하여 나타내야 한다.
+		곡선이 있는 문자의 정보 확인 -> 점의 정보가 더 많다.
+		
+    for(int i = 0; i < p.PointCount; i++)
+    {
+        Console.WriteLine("Num{0}: X{1}, Y{2}", i, p.PathPoints[i].X, p.PathPoints[i].Y);
+    }
+	
+
+- Tick time check (Time interval, Time span check) - (Sorted)
+	http://blog.daum.net/hugerock70/283
+		DateTime vs. TimeSpan
+
+	DateTime startTime = DateTime.Now;
+	DateTime endTime = DateTime.Now;
+	Console.WriteLine("프로그램 수행시간 : {0}/ms", (double)(endTime - startTime).Ticks / 1000000.0F); 	// 부정확하다.
+		// endDateTime.Subtract(startDateTime).TotalSeconds.ToString("#.##");	// 이 방법 사용.
+		
+    string strLogParam = string.Format("Time:{0}s", endTime.Subtract(startTime).TotalSeconds.ToString("#.##"));
+    string strTime = System.DateTime.Now.ToString("[HH:mm:ss]");
+    cTxt_LogEventData.AppendText(strTime + "PLT file load end. " + strLogParam + Environment.NewLine);
+		
+
+	Note) Stop watch를 이용해서 측정도 가능하다.
+		using System.Diagnostics;
+		Stopwatch sw = new Stopwatch();
+		sw.Start();
+		// 처리 프로세스
+		// while, for, foreach 등
+		sw.Stop();
+		MessageBox.Show(sw.ElapsedMilliseconds.ToString() + "ms");	// 위의 방법과 동일한 결과가 나타난다.
+		출처: http://cowvoice.tistory.com/2 [프로그래밍하는 소]
+		
+		
+- Thread (Background task)
+	Toolbar에서 BackgroundTask control을 붙여서 사용해도 Thread와 동일하다.
+		http://mainia.tistory.com/306
+			-> Background worker를 이용하는 방법.
+	Backgroundworker.DoWork
+		http://www.csharpstudy.com/WinForms/WinForms-backgroundworker.aspx
+			-> Progress로 값을 던져서 출력할 수 있다.
+			-> DoWork thread에서 값을 받을수 있다.
+		DoWork 부분이 실제 thread와 동일하게 실행하는 부분이다.
+		이 부분은 Mainform을 제어할 수 없다.
+		DoWork 중에 Progress를 호출하는 부분을 사용해서 progress를 처리하는 부분에서 Mainform을 제어할 수 있다.
+	Backgroundworker 종료시 사용되는 부분도 progress 처럼 Mainform을 제어할 수 있다.
+	backgroundworker progress 부분의 너무 빈번한 progress update도 다른 컨트롤이 동작하지 않는 동일한 문제가 발생한다.
+	
+		
+- Thread 
+	Worker workerObject = new Worker();
+	Thread workerThread = new Thread(workerObject.DoWork);
+
+	// Start the worker thread.
+	workerThread.Start();
+	Console.WriteLine("main thread: Starting worker thread...");
+
+	// Loop until worker thread activates.
+	while (!workerThread.IsAlive) ;
+
+	// Put the main thread to sleep for 1 millisecond to
+	// allow the worker thread to do some work:
+	Thread.Sleep(1);
+
+	// Request that the worker thread stop itself:
+	workerObject.RequestStop();
+
+	// Use the Join method to block the current thread 
+	// until the object's thread terminates.
+	workerThread.Join();
+	Console.WriteLine("main thread: Worker thread has terminated.");
+
+	// 위 방법으로 종료된 thread를 다시 시작할 수는 없다. 
+	// workerThread.Start(); 를 다시 하면 에러 발생.
+
+	Thread가 실행되고 있는 동안 다른 작업이 진행되고 있다. 즉, 버튼 이벤트 등이 동작한다.
+	단, 프로그램이 종료되어도 쓰레드는 동작하고 있기에 종료시 thread를 항상 종료시켜 주어야 한다.
+	한 번만 실행되는 thread를 구성 -> workerThread.Start()로 반복 실행이 가능하다.
+	
+	Note) Thread class에서 Mainform의 컨트롤 접근 방법은?
+		메인폼에 값을 쓰기 -> 이것은 direct로는 불가능하다. Invoke의 방법을 사용해야 한다.
+
+
+- C# datagridview 처음 로드시 셀선택 막기 (미확인)
+	바인딩 하시고
+		dataGridView1.ClearSelection(); 호출해보세요.
+	또는 
+		dataGridView1.CurrentCell = dataGridView1.TopLeftHeaderCell;
+
+
+- File extension 얻기 -> 점을 기준으로 split 
+	이외의 다른 방법은? 
+		strFileExt = Path.GetExtension(strFileName);
+		".ptn"을 return 한다.
+
+		
+- File open (Fileopen)
+	Open file filter에 여러 확장자를 등록하는 방법은?
+		openFileDialog.Filter = "DXF, Pattern file(*.dxf, *.ptn)|*.dxf;*.ptn";
+
+		
+- File open
+	PLT data의 file read 부분 참고로 할 것. -> 정리 요함.
+        if(strFileExt.ToLower() == ".ptn")
+        {
+            FileStream fsPattern;
+            StreamReader srPattern;
+            string strGetData = "";
+            string strObject, strParam;
+
+            fsPattern = System.IO.File.Open(strFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            srPattern = new StreamReader(fsPattern);
+            //strGetData = srReal.ReadLine();             // Skip first line 
+
+            int iCount = 0;
+
+            while ((strGetData = srPattern.ReadLine()) != null)
+            {
+                string[] strSplitData = strGetData.Split(new string[] { ";" }, StringSplitOptions.None);
+                strObject = strSplitData[0]; strParam = strSplitData[1];
+
+                cGrid_Entity.Rows.Add(iCount, strObject, strParam);
+                cTxt_LogEventData.AppendText(iCount.ToString() + strObject + ";" + strParam + Environment.NewLine);
+                iCount++;
+            }
+
+            fsPattern.Close();
+            srPattern.Close();
+
+        }
+		
+
+- File save 
+    SaveFileDialog saveFileDialog = new SaveFileDialog();
+    //saveFileDialog.Filter = "Pattern(*.ptn)|*.ptn";
+    saveFileDialog.Filter = "Pattern(*.ptn)|*.ptn|Pattern(*.xml)|*.xml";	// 앞에서 부터 인덱스의 순서이다.
+    //saveFileDialog.Filter = "Pattern(*.xml)|*.xml|Pattern(*.ptn)|*.ptn";
+    saveFileDialog.FilterIndex = 2;	// xml을 먼저 선택하도록 한다.
+    //saveFileDialog.DefaultExt = "ptn";
+    saveFileDialog.DefaultExt = "xml";
+
+
+	private void button2_Click(object sender, System.EventArgs e)
+	{
+	   // Displays a SaveFileDialog so the user can save the Image
+	   // assigned to Button2.
+	   SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+	   saveFileDialog1.Filter = "JPeg Image|*.jpg|Bitmap Image|*.bmp|Gif Image|*.gif";
+	   saveFileDialog1.Title = "Save an Image File";
+	   saveFileDialog1.ShowDialog();
+
+	   // If the file name is not an empty string open it for saving.
+	   if(saveFileDialog1.FileName != "")
+	   {
+		  // Saves the Image via a FileStream created by the OpenFile method.
+		  System.IO.FileStream fs = 
+			 (System.IO.FileStream)saveFileDialog1.OpenFile();
+		  // Saves the Image in the appropriate ImageFormat based upon the
+		  // File type selected in the dialog box.
+		  // NOTE that the FilterIndex property is one-based.
+		  switch(saveFileDialog1.FilterIndex)
+		  {
+			 case 1 : 
+			 this.button2.Image.Save(fs, 
+				System.Drawing.Imaging.ImageFormat.Jpeg);
+			 break;
+
+			 case 2 : 
+			 this.button2.Image.Save(fs, 
+				System.Drawing.Imaging.ImageFormat.Bmp);
+			 break;
+
+			 case 3 : 
+			 this.button2.Image.Save(fs, 
+				System.Drawing.Imaging.ImageFormat.Gif);
+			 break;
+		  }
+
+	   fs.Close();
+	   }
+	}
+
+
+- Event log (Text box)
+	Log Event
+		string strLog = "";
+		string strTime = System.DateTime.Now.ToString("[HH:mm:ss]");
+		strLog = String.Format("RTC4 ececute_list {0}", iRTC_Repeat);
+		cTxt_LogEventData.AppendText(strTime + strLog + Environment.NewLine);
+
+
+- Timer 
+	Timer 
+		public System.Windows.Forms.Timer tmr_TCPSend;	// form timer로 설정.
+		// Timer로만 지정해 두면 Thread timer와 구별이 되지 않는 에러 발생.
+
+
+- 지정된 폴더(Folder)에서 파일명(File Name) 목록(List) 얻기
+	String FolderName = tbFolder.Text;	// Folder name 지정.
+	System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(FolderName);
+	foreach (System.IO.FileInfo File in di.GetFiles())
+	{
+		if (File.Extension.ToLower().CompareTo(".xrv") == 0)
+		{
+			String FileNameOnly = File.Name.Substring(0, File.Name.Length - 4);
+			String FullFileName = File.FullName;
+	 
+			MessageBox.Show(FullFileName + " " + FileNameOnly);
+		}
+	}
+
+	
+- Data 좌표계 -> 화면 좌표계 
+	화면 좌표계
+		원점 : 왼쪽 위
+		오른쪽 아래로 갈수록 수치가 증가한다.
+	Data 좌표계 
+		원점 : 왼쪽 아래 
+		오른쪽 위로 갈수록 수치가 증가한다.
+	좌표계의 scale 변환
+		ex) Data scale : 0 ~ 2000000
+			Screen scale : 0 ~ 240
+				240 : 2000000 = x : Value 
+				x = (Value * 240) / 2000000
+	좌표계의 원점 이동 (Offset 값을 더하면 된다)
+	
+	Note) 위의 과정을 진행하면 Y좌표만 좌표계가 반전된 결과가 된다.
+		따라서 마지막으로 Y좌표를 반전하기 위해서는 Bottom에서 현재 구한 Y좌표를 빼 주어야 한다.
+		
+
+- Form load 
+	form_load 
+		Note) Form load를 하면서는 View가 그려지지 않는다.
+
+		
+- Console 
+	Console.WriteLine ("Hex: {0:X}", nNum);		// Hex value display
+	
+
+- MainForm size 가변 
+	MainForm (Size)
+		AutoSize : True
+		FormBorderStyle : Fixed3D (고정 크기)
+			Sizable
+			-> 내부 control 크기 이하로는 줄어들지 않는다.
+			-> 확대를 해도 내부 컨트롤이 같이 확장되지 않는다.
+		AutoSizeMode : GrowOnly 
+			-> GrowAndShrink -> 크기 커서가 나오지 않는다.
+		AutoSize를 false로 해야 하는가?
+			false로 하니 줄일경우 control이 잘려서 나타난다.
+			
+
+- Scanlab (RTC4)
+	2) get_status로 상태를 읽어서 0인 경우 리스트의 실행 완료 상태.
+		get_status(busy, position)
+
+	1) Marking 이전에 항상 속도 parameter를 준 상태에서 execute_list를 해야 하는가? -> 맞다.
+		관련 parameter를 list command에 mark, jump 이전에 같이 넣어 주어야 한다.
+
+
+- Text file read 
+	while((line = file.ReadLine()) != null)  
+	{  
+		System.Console.WriteLine (line);  
+		counter++;  
+	}  
+
+
+- DataGridView
+	11) DataGridView에서 last column을 view size에 맞게 확장할 수는 없는가?
+		Last column의 속성을 Fill로 하면 된다.
+
+	10) DataGridView delete key block 기능 추가.
+		속성에서 막도록 해 버린다. 
+			AllowUserToDeleteRows : False 
+	
+		private void cGrid_RTC_MarkParameter_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
+        {
+            //e.Cancel = MessageBox.Show("Do you want really to delete the selected row", "Confirm", MessageBoxButtons.OKCancel) != DialogResult.OK; ;
+            e.Cancel = true;
+        }
+
+	9) Header 클릭시 정렬방지 -> 가능함.
+		cGrid_Entity.Columns[0].SortMode = DataGridViewColumnSortMode.NotSortable;
+
+		NotSortable을 설정하니 column width가 변경되어 버렸다.
+			Column width를 수정 불가능하도록 해 놓았는데... 자동 넓이인가?
+			컬렉션 
+				Resizable : False 
+				AutoSizeMode : NotSet
+			위와 같이 재수정.
+		
+        foreach (DataGridViewColumn column in gridviewname.Columns)
+        {
+            column.SortMode=DataGridViewColumnSortMode.NotSortable;
+        } 
+		[출처] DataGridView Header 클릭시 정렬방지|작성자 까칠한나
+
+	8) DataGridView의 마지막 빈 공란 diable
+		cGrid_Entity.AllowUserToAddRows = false;
+		// 위 내용을 추가하면 마지막 빈 공란은 나타나지 않는다.
+		// 사용자가 추가할 수 있도록 하려면 위 항목을 true로 해 두어야 한다.
+
+	7) Sorting시 치명적에러 문제
+		값을 변경한 뒤에는 숫자와 문자열의 차이로 인한 sorting이 안 되는 현상이였다.
+		Automatic 으로 정렬하면 이 부분에서 문제가 발생한다.
+		
+		private void cGrid_Entity_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+		{
+			int iRowIndex = this.cGrid_Entity.CurrentCellAddress.Y;
+			if (iRowIndex == -1)
+				return;
+
+			if (e.ColumnIndex == 0)
+			{
+				int iValue = int.Parse(cGrid_Entity.Rows[e.RowIndex].Cells[0].Value.ToString());
+				cGrid_Entity.Rows[e.RowIndex].Cells[0].Value = iValue;
+			}
+		}
+		// 값의 타입을 바꾸어 주어서 해결.
+
+	6) Multi-select
+		Select list의 순서는 선택된 내용의 역순으로 나타난다.
+		if (cGrid_Entity.SelectedRows.Count > 0)
+			;   // textBox1.Text = grid1.SelectedRows[0].Cell[1].Value.ToString();
+	
+		for (int i = 0; i < cGrid_Entity.SelectedRows.Count; i++)
+		{
+			strObject = cGrid_Entity.SelectedRows[i].Cells[1].Value.ToString();
+			strParam = cGrid_Entity.SelectedRows[i].Cells[2].Value.ToString();
+		}
+
+	5) Get value 
+		String strNum, strObject, strParam;
+		int iRowIndex = this.cGrid_Entity.CurrentCellAddress.Y;
+		strNum = cGrid_Entity.Rows[iRowIndex].Cells[0].Value.ToString();
+		strObject = cGrid_Entity.Rows[iRowIndex].Cells[1].Value.ToString();
+		strParam = cGrid_Entity.Rows[iRowIndex].Cells[2].Value.ToString();
+
+	4) DataGridViewButtonColumn (버튼)
+		//DataGridViewButtonColumn buttonColumn = new DataGridViewButtonColumn();
+		//buttonColumn.HeaderText = "Button";
+		//buttonColumn.Name = "button";
+		//cGrid_SPI_G4_Parameter.Columns.Add(buttonColumn);
+		-> 후추에는 코드로 모두 다 처리하는 것이 났겠다. Design으로 하니 코드는 제일 마지막 부분에 추가되어 버린다.
+		http://purestarman.tistory.com/246
+			DataGridView에서 ComboBox, CheckBox, Button 추가 하기
+
+		void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)  
+		{  
+			if (e.ColumnIndex == btnColumnIdx)  
+			 {  
+				 string id = dataGridView1.Rows[e.RowIndex].Cells["ID"].Value.ToString();  
+				 string name = dataGridView1.Rows[e.RowIndex].Cells["Name"].Value.ToString();  
+
+				 MessageBox.Show(string.Format("ID : {0}, Name : {1}", id, name));  
+			 }  
+		}
+		출처: http://denisoh.tistory.com/entry/DataGridView에서-버튼-다루기 [최고의 개발 인프라 닷넷]		
+
+	3) Cell의 width를 자동으로 내용에 맞게 설정하는 모드. 
+		컬렉션 
+			레이아웃 
+				AutoSizeMode : AllCells
+
+	2) Combobox cell add.
+		string[] datasource = { "0:InpX", "1:VoltX", "2:MPosX", "3:ErrX", "4:PosX", "5:InpY", "6:VolY", "7:MPosY", "8:ErrY", "9:PosY"};
+		DataGridViewComboBoxCell combo = new DataGridViewComboBoxCell();
+		combo.DataSource = datasource.ToList();
+		MainForm.cSystem.scr_Sub.cGrid_DC3000_Scope.Rows[1].Cells[1] = combo;
+		combo.Value = combo.Items[0];       // Initial value set. 반드시 combobox를 추가한 후에 설정해야 한다.
+		// ComboBox cell 사용법 -> Row 선택된 상태에서 Space를 눌러도 combox가 선택된다. 이 상태에서 커서를 이용해서 아이템을 선택해도 된다.
+		// 셀 선택 (해당 Row 선택된 상태. 이 상태에서 다시 cell 선택(화살표 경계 사라짐). 이 상태에서 다시 선택하면 드롭다운 메뉴가 나타난다)
+
+	1) Row를 Height 고정
+        MainForm.cSystem.scr_Sub.cGrid_DC3000_Scope.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
+        MainForm.cSystem.scr_Sub.cGrid_DC3000_Scope.AllowUserToResizeRows = false;
+
+
+- ComponentOne studio (Chart)
+	ComponentOne이 설치되지 않은 PC에 사용된 source를 열면 VS2015가 down된다.
+
+	C1Chart 
+		Chart type : XYPlot 
+
+	Help file이 Online help 밖에 없다.
+	
+	Chart Samples
+		1)PrintIt2D : Print 하기 위한 예제
+			.chart2dxml file을 사용한다.
+				-> 이 파일 포멧으로 저장한 경우 바로 열기만 하면 쉽게 확인이 가능할 것으로 판단된다.
+
+	1) C1Chart의 DataTable에 값을 설정하는 방법은
+		DataTable
+			series0 
+				X Sample interval, Y cc
+
+				Setting the X and Y Data Arrays Using Point Values
+		ChartDataSeries  s = new ChartDataSeries();
+		값이 바로 반영된다. 하지만 추가로 되어 버린다.
+
+
+- Binary file control 
+	string datafile = "Cor_1to1.ctb";
+	//string datafile = "10160590.ctb";
+	//string datafile = "Noname";
+
+	UInt16 uTemp;
+
+	using (BinaryReader reader = new BinaryReader(File.Open(datafile, FileMode.Open)))
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			uTemp = reader.ReadUInt16();
+			Console.WriteLine("Data:{0}", uTemp);
+		}
+	}
+	
+	Note) RTC의 correction file은 위와 같이 단순히 UInt16 type의 수치 데이터가 순서대로 저장되어 있는 것이다.
+		Zero calibration file의 경우 (65535 x 65535)를 (65 x 65) 등분한 값이다.
+		따라서 1024 단위로 증가한다. (1024 * 64) = 65536
+		
+
+- system date 
+	system.datetime.now.tostring("yyyy/mm/dd hh:mm:ss");
+	
+	http://www.csharp-examples.net/string-format-datetime/
+		DateTime dt = new DateTime(2008, 3, 9, 16, 5, 7, 123);
+		String.Format("{0:T}", dt);  // "4:05:07 PM"                      LongTime
+	
+
+- EditBox log 
+	Editbox를 이용한 log 구현 방법함.
+		https://stackoverflow.com/questions/1347225/c-sharp-writing-a-log-using-a-textbox
+			-> 이 방법을 사용하거나 또는 listbox를 사용할 것을 권하고 있다.
+
+		Example 1)
+			To add it at the top:
+				textBox.Text = newText + Environment.NewLine + textBox.Text;
+			To append it:
+				textBox.Text += Environment.NewLine + newText;
+		Example 2)
+			myTextBox.AppendText(newLogEntry + Environment.NewLine);
+
+
+- Socket 통신 
+    MainForm.cTCPClient2.ConnectToServer("172.20.87.100", 30704);
+
+    strMsg = "\x1b\x01\x00\x00\x00\x00\x00\x00\x00";
+    MainForm.cTCPClient2.SendMessage(strMsg);
+
+    MainForm.cTCPClient2.StopClient();
+	// 첫 번째 연결 종료
+	
+    MainForm.cTCPClient2.ConnectToServer("172.20.87.100", 30704);
+
+    strMsg = "\x1b\x02\x00\x00\x00\x02\x00\x00\x00";	
+    MainForm.cTCPClient2.SendMessage(strMsg);
+
+    MainForm.cTCPClient2.StopClient();
+	// 두 번째 연결 종료 
+	
+	위와 같이 동일 대상에 두 번의 접속과 종료를 하면 
+	접속하는 client의 port는 접속할 때마다 다르게 된다.
+	Note) Wireshark로 패킷을 모니터링 해 보면 알 수 있다.
+
+
+- string에 16진수 데이터 저장.
+    String strMsg = "\x0d\x0a\x0d\x0a";      // 0x0d, 0x0a, 0x0d, 0x0a
+    MainForm.cTCPClient.SendMessage(strMsg);
+    Thread.Sleep(10);
+
+
+- SmartMove 
+    private void btn_DC3000_Connect_Click(object sender, EventArgs e)
+    {
+        MainForm.cTCPClient.ConnectToServer("172.20.87.100", 10001);
+        //MainForm.cTCPClient.ConnectToServer("127.0.0.1", 10001);
+        lbl_DC3000_Status.Text = "DC3000 Connect";
+
+        Thread.Sleep(100);
+
+        String strMsg = "\x0d\x0a\x0d\x0a";      // 0x0d, 0x0a, 0x0d, 0x0a
+        MainForm.cTCPClient.SendMessage(strMsg);
+        Thread.Sleep(10);
+
+        MainForm.cTCPClient2.ConnectToServer("172.20.87.100", 30704);
+        lbl_DC3000_Status.Text = "DC3000 30704 Connect1";
+
+        strMsg = "\x1b\x01\x00\x00\x00\x00\x00\x00\x00";
+        MainForm.cTCPClient2.SendMessage(strMsg);
+        Thread.Sleep(10);
+
+        strMsg = "\x0d\x0a\x0d\x0a";      // 0x0d, 0x0a, 0x0d, 0x0a
+        MainForm.cTCPClient.SendMessage(strMsg);
+        Thread.Sleep(100);
+
+        MainForm.cTCPClient2.StopClient();
+        Thread.Sleep(100);
+
+        MainForm.cTCPClient2.ConnectToServer("172.20.87.100", 30704);
+        lbl_DC3000_Status.Text = "DC3000 30704 Connect2";
+        Thread.Sleep(100);
+
+        strMsg = "\x1b\x02\x00\x00\x00\x02\x00\x00\x00";		// DC3000 connection
+        MainForm.cTCPClient2.SendMessage(strMsg);
+        Thread.Sleep(100);
+
+        MainForm.cTCPClient2.StopClient();
+
+    }
+
+    private void btn_SmartConnect_Click(object sender, EventArgs e)
+    {
+        MainForm.cTCPClient.ConnectToServer("172.20.87.100", 10001);
+
+        Thread.Sleep(100);
+
+        String strMsg = "\x0d\x0a\x0d\x0a";      // 0x0d, 0x0a, 0x0d, 0x0a
+        MainForm.cTCPClient.SendMessage(strMsg);
+        Thread.Sleep(10);
+
+        MainForm.cTCPClient2.ConnectToServer("172.20.87.100", 30704);
+        lbl_DC3000_Status.Text = "ISE 30704 Connect1";
+
+        strMsg = "\x1b\x01\x00\x00\x00\x00\x00\x00\x00";
+        MainForm.cTCPClient2.SendMessage(strMsg);
+        Thread.Sleep(10);
+
+        strMsg = "\x0d\x0a\x0d\x0a";      // 0x0d, 0x0a, 0x0d, 0x0a
+        MainForm.cTCPClient.SendMessage(strMsg);
+        Thread.Sleep(100);
+
+        MainForm.cTCPClient2.StopClient();
+        Thread.Sleep(100);
+
+        MainForm.cTCPClient2.ConnectToServer("172.20.87.100", 30704);
+        lbl_DC3000_Status.Text = "ISE 30704 Connect2";
+        Thread.Sleep(100);
+
+        strMsg = "\x1b\x02\x00\x00\x00\x00\x00\x00\x00";		// ISE connection
+        MainForm.cTCPClient2.SendMessage(strMsg);
+        Thread.Sleep(100);
+
+        MainForm.cTCPClient2.StopClient();
+
+    }
+
+
+- File write
+    try
+    {
+        string strFileName = "RT_POS_OUT_X" + System.DateTime.Now.ToString("_hhmmss") + ".txt";
+        FileStream fs = File.Open(strFileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+        StreamWriter sw = new StreamWriter(fs);
+        sw.WriteLine(strGetData);
+        sw.Close();
+        fs.Close();
+    }
+    catch
+    {
+
+    }
+
+
+- string array의 사용.	
+	string[] strMarkParameter = { "MV_MARKSPEED", "MV_JUMPSPEED", "MV_MARKDELAY", "MV_JUMPDELAY", "MV_PLLYDELAY", "MV_ONDELAY", "MV_OFFDELAY", "FIELD_SCALE_X", "FIELD_SCALE_Y", "FIELD_XY_FLIP" };
+	string[] strMarkParameterValue = { "1000", "100", "200", "500", "100", "100", "100", "100", "100", "0" };
+	string[] strMarkParameterUnit = { "Bit/ms", "Bit/ms", "us", "us", "us", "us", "us", "%", "%", "Bool" };
+	
+	for (int i = 0; i < strMarkParameter.Length; i++)
+	{
+		MainForm.cSystem.scr_Sub.cGrid_MarkParameter.Rows.Add(strMarkParameter[i], strMarkParameterValue[i], strMarkParameterUnit[i]);
+	}
+
+
+- Draw창 실시간 좌표 표시. MouseMove event use
+	private void pic_View_MouseMove(object sender, MouseEventArgs e)
+	{
+		// Position display to Scr_Sub 
+		Control control = (Control)sender;
+		Point currentPosition = new Point();
+		currentPosition = pic_View.PointToClient(MousePosition);
+
+		string strPosition = string.Format("X,Y : {0},{1}", currentPosition.X, currentPosition.Y);
+
+		//Console.WriteLine("X,Y :{0},{1}", currentPosition.X, currentPosition.Y);
+		Console.WriteLine(strPosition);
+
+		MainForm.cSystem.scr_Sub.lblPosition.Text = strPosition;
+	}
+	
+
+
+- RTC4 parameter setting 
+	// Desired Nd:YAG Laser Timing for YAG mode 1
+	const uint LASER = 10000;           // Laser pulse frequency in Hz.
+	const uint PULSE = 5;               // Pulse width in microseconds.
+	const uint PULSE1ST = 2;            // Amount of pulses the first
+										// pulse killer FPK
+										// should be active.
+	// Frequency Base
+	const uint MEGA = (1000 * 1000);
+	const uint FREQBASE = (8 * MEGA);   // Corresponding to a time base
+										// of 1/8 microseconds.
+	// Derived Laser Timing in microseconds
+	const uint FPK = ((100 * PULSE1ST + 50) * FREQBASE / 100 / LASER);
+	const uint HALF_PERIOD = (FREQBASE / LASER / 2);
+	const uint PULSE_WIDTH = (PULSE * FREQBASE / MEGA);
+
+	set_start_list(1);
+	// Wait for 2 seconds
+	long_delay(50000);
+	long_delay(50000);
+	long_delay(50000);
+	long_delay(50000);
+	set_laser_timing(
+			(ushort)HALF_PERIOD,    // half of the laser signal period
+			(ushort)PULSE_WIDTH, 2, // pulse widths of signal LASER1
+			1);             // time base; 0 corresponds to 1 microsecond.
+	// Otherwise, the time base is 1/8 microseconds.
+	set_scanner_delays(25,  // jump delay in 10 microseconds
+					10,     // mark delay in 10 microseconds
+					5);     // polygon delay in 10 microseconds
+	set_laser_delays(100,   // laser on delay in microseconds
+					100);   // laser off delay in microseconds
+	set_jump_speed(1000.0); // jump speed in bits per milliseconds
+	set_mark_speed(250.0);  // marking speed in bits per milliseconds
+	set_end_of_list();
+	execute_list(1);
+
+
+- string 
+	http://infodbbase.tistory.com/94
+		-> C# string 정리.
+	strPltData.Substring(strPltData.Length-2) != "PD"
+		// 문자열 뒤에서 2자리만 구하기.
+		
+
+- PLT file (HPGL)
+	string strData = "PU-20,-20;\r\nPD-20,20,20,20,20,-20,-20,-20;";
+		Pen up 상태의 이동은 draw와는 무관한 이동. 따라서 draw에서는 항상 start point
+
+
+- string split 
+	//string[] strTextValue = strData.Split(new char[] { '\n' });  // '\n'를 기준으로 잘라서 배열에 넣어라.
+	string[] strTextValue = strData.Split(new string[] { "\r\n" }, StringSplitOptions.None);    // Remove '\r' need.
+
+	for (int i = 0; i < strTextValue.Length; i++)  // 배열은 0 부터 저장되며, 배열의 길이만큼 순환
+	{
+		Console.WriteLine(i + " line => " + strTextValue[i]);
+		//Console.Write(i + " line => " + strTextValue[i]);
+	}
+
+	http://hunq.blogspot.kr/2016/09/c-split.html
+		-> c# Split (문자열 분할, 자르기) 
+	
+
+- TextBox 
+	// Get data from text box 
+	string strData = "";
+	strData = cTxt_PltData.Text;
+
+	방법: TextBox 컨트롤의 텍스트 시작 또는 끝 위치에 커서 놓기
+		https://msdn.microsoft.com/ko-kr/library/ms752349(v=vs.110).aspx
+	textBoxCorrectionFile.Text = @"E:\Src\VCSharp2015\Duwon\Marker\Marker\bin\Debug\Cor_1to1.ctb";
+	toolTipsubRTCOpticform.SetToolTip(textBoxCorrectionFile, textBoxCorrectionFile.Text);
+	textBoxCorrectionFile.Select(textBoxCorrectionFile.Text.Length, 0);
+	
+	
+- Console 
+	Console.WriteLine(i + " line => " + strTextValue[i]);
+	Console.Write(i + " line => " + strTextValue[i]);
+
+
+- Tab control 
+	초기 tab으로 지정
+		cTab_Sub.SelectedTab = cTab_Sub.TabPages[1];    // RTC tab select
+
+
+- Text file read 
+	http://infodbbase.tistory.com/113
+		-> Text file read example 
+			Read all line 
+			Read single line 
+
+
+- file open dialog 
+	초기 open file 위치를 지정하지 않으면 현재 위치에서 연다.
+	private void btn_FileOpen_Click(object sender, EventArgs e)
+	{
+		// PLT data file open
+		OpenFileDialog openFileDialog = new OpenFileDialog();
+		openFileDialog.Filter = "PLT file(*.plt)|*.plt";
+
+		openFileDialog.InitialDirectory = "";   // Current working directory set    ex)"C:\\"
+		openFileDialog.Title = "Select PLT file";
+
+		if(openFileDialog.ShowDialog() == DialogResult.OK)
+		{
+			cTxt_PltData.Text = openFileDialog.FileName;
+			// Add file contents
+		}
+	}
+
+
+- RTC control 
+	// Open the list at the beginning
+	set_start_list((ushort)list);		// list = 1 or 2
+	jump_abs(destination.xval, destination.yval);
+	mark_abs(destination.xval, destination.yval);
+	set_end_of_list();
+
+	execute_list(1);
+
+
+- picture box size control 
+	MainForm.cSystem.scr_View.pic_View.Size = new System.Drawing.Size(400, 400);
+
+
+- arraylist 
+	정렬 
+        arraylistIndex.Sort();	// 기본 오름차순 정렬.
+        arraylistIndex.Reverse();	// 이것을 다시 역으로 정렬하여 내림차순으로 바꾼다.
+
+        for (int i = 0; i < arraylistIndex.Count; i++)
+        {
+            cGrid_Entity.Rows.RemoveAt((int)arraylistIndex[i]);
+        }
+	
+
+	using System.Collections;
+	
+	// DrawLineData structure arrayList
+	ArrayList arraylistLine;
+	arraylistLine = new ArrayList();
+	DrawLineData inputData;
+	inputData = new DrawLineData(pointStartLine, pointEndLine);
+	arraylistLine.Add(inputData);
+	
+	// string[] ArrayList
+	ArrayList arrayListCmdLine = new ArrayList();
+	string[] strCmdLineValue = strTextValue[i].Split(new char[] { ';' });
+	arrayListCmdLine.Add(strCmdLineValue[j]);
+	
+	// class ArrayList 
+    public class EntityData
+    {
+        public EntityData()
+        {
+        }
+
+        public EntityData(string Num, string Object, string Param)
+        {
+            strNum = Num;
+            strObject = Object;
+            strParam = Param;
+        }
+        public string strNum { get; set; }
+        public string strObject { get; set; }
+        public string strParam { get; set; }
+
+    }
+
+	ArrayList arraylistEntity = new ArrayList();	
+	arraylistEntity.Add(new EntityData(strNum, strObject, strParam));
+
+    for (int i = 0; i < arraylistData.Count; i++)
+    {
+        entityData = (EntityData)arraylistData[i];
+        strNum = entityData.strNum;
+        strObject = entityData.strObject;
+        strParam = entityData.strParam;
+	}
+				
+	
+	
+- string to int
+	int iRepeat = int.Parse(cTxt_SmarConnectRepeat.Text);
+
+	try {
+        int number = Int32.Parse(value); 
+        Console.WriteLine("{0} --> {1}", value, number);
+     }
+     catch (FormatException) {
+        Console.WriteLine("{0}: Bad Format", value);
+     }   
+     catch (OverflowException) {
+        Console.WriteLine("{0}: Overflow", value);   
+     }  
+
+
+- string to byte array & byte array to string
+	// 문자열을 바이트 배열으로 변환
+	ao.Buffer = Encoding.Unicode.GetBytes(message);
+		// 문자 하나하나마다 null이 추가되어 버린다. Unicode는 2 byte 문자이기 때문에 기존 ASCII 문자를 사용하면 나머지 하나의 byte는 0으로 채워지는 것으로 추정된다.
+
+	// 바이트 배열을 String으로 변환 
+	private string ByteToString(byte[] strByte) 
+	{ string str = Encoding.Default.GetString(StrByte); return str; } 
+
+	// String을 바이트 배열로 변환 
+	private byte[] StringToByte(string str) 
+	{ byte[] StrByte = Encoding.UTF8.GetBytes(str); return StrByte; } 
+
+	출처: http://zephie.tistory.com/11 [zephie DebugHolic]
+
+	// 수신받은 자료의 크기가 1 이상일 때에만 자료 처리
+	if ( recvBytes > 0 ) {
+		// 공백 문자들이 많이 발생할 수 있으므로, 받은 바이트 수 만큼 배열을 선언하고 복사한다.
+		Byte[] msgByte = new Byte[recvBytes];
+		Array.Copy(ao.Buffer, msgByte, recvBytes);
+		
+		// 받은 메세지를 출력
+	    //Console.WriteLine("메세지 받음: {0}", Encoding.Unicode.GetString(msgByte));
+		Console.WriteLine("메세지 받음: {0}", Encoding.ASCII.GetString(msgByte));
+	}
+
+	public void SendMessage(String message) {
+	    // 추가 정보를 넘기기 위한 변수 선언
+	    // 크기를 설정하는게 의미가 없습니다.
+	    // 왜냐하면 바로 밑의 코드에서 문자열을 유니코드 형으로 변환한 바이트 배열을 반환하기 때문에
+	    // 최소한의 크기르 배열을 초기화합니다.
+	    AsyncObject ao = new AsyncObject(1);
+	
+		// 문자열을 바이트 배열으로 변환
+		//ao.Buffer = Encoding.Unicode.GetBytes(message);	// 유니코드형은 2 byte 이기 때문에 나머지 하나의 바이트가 0으로 채워지는 것으로 추정된다.
+		ao.Buffer = Encoding.ASCII.GetBytes(message);
+		......
+	}
+
+
+- Socket 통신 
+	Socket.Connect(hostName, hostPort)		// String, uShort
+		IP address, port number
+		using System.Net.IPAddress
+
+
+- 멤버 함수의 외부 접근 
+	//private SFPoint RotateTransformation(SFPoint sfStartPoint, SFPoint sfCenterPoint, float fAngle)
+	public static SFPoint RotateTransformation(SFPoint sfStartPoint, SFPoint sfCenterPoint, float fAngle)
+		-> 이렇게 해야 외부에서 접근이 가능하다. public static 
+
+		
+- DrawArc 
+	타원 정의의 왼쪽 위 모서리. 타원 정의의 너비, 높이. 
+	GDI+는 항상 시계방향으로 그린다.
+	예제) Dxf file
+		AutoCAD에서 시계방향으로 click 하여 그려도 등록된 속성의 start, end angle은 반시계 방향이다.
+	
+	SweepAngle
+		StartAngle < EndAngle : SweepAngle = EndAngle - StartAngle
+		StartAngle > EndAngle : SweepAngle = (360 - StartAngle) + EndAngle
+
+	시계 방향 그리기 (좌표 반전시에)
+		EndAngle을 그리기의 시작 지점으로 정하고 SweepAngle 만큼 그리면 된다 -> 아니다. 아래 내용을 추가해야 한다.
+		Rotation 방향에 따라 start, end angle의 값이 다르다.
+			ex) 시계방향을 각도의 기준으로 설정시 
+				시계방향 30도 = 반시계 방향 (360 - 30)도
+			따라서 현재 반시계 방향 EndAngle의 값을 시계 방향의 값으로 변경해야 하므로 (360 - EndAngle)으로 변경해야 한다.
+			결국 각도의 Rotation 방향을 (시계 <-> 반시계)로 상호 변환하기 위해서는 (360 - Angle)을 하면 된다.
+			따라서 DrawArc의 StartAngle = 360 - EndAngle이 된다. (EndAngle루터 그리기 시작해야 하기 때문)
+	
+
+- Point, Color 구조체 
+	using system.drawing 필요
+
+
+- Graphics draw 
+	좌표 변환 (Transform)
+		ex) Marker project : ellipse에서 circle로 변경시 circle 하이라이트가 되지 않는 증상.
+			Transform 때문인가?
+				ellipse erase code를 제거하면 정상 동작한다.
+					-> 좌표 변환이 복원되지 않은 것으로 추정된다.
+						-> graphics 변수를 새로 선언해서 사용하도록 수정하여 정상 사용.
+							-> 좌표축을 변환한 것이 복원되지 않는 현상이 맞다 -> 추후 복원 방법 재확인 요함.
+		좌표축 변환 후 복원이 안 되는 증상이 보인다. C# 버그인지 확인 필요. 
+
+
+- DataGridView 
+	선택된 행들의 실제 인덱스 얻기.
+		arraylistIndex.Add(cGrid_Entity.SelectedRows[i].Index);
+
+	// RowIndex를 얻는 방법
+		int iRowIndex = this.cGrid_Object.CurrentCellAddress.Y;
+		// ex) cell change event
+
+	string strFileNameY = this.cGrid_FirstX_FileList.Rows[iRowIndex].Cells[0].Value.ToString();
+		
+	Cell click event	
+	// RowIndex 받기(얻기)
+		private void cGrid_Object_CellClick(object sender, DataGridViewCellEventArgs e)
+		{
+			String strNum, strObject, strParam;
+			strNum = cGrid_Object.Rows[e.RowIndex].Cells[0].Value.ToString();
+			strObject = cGrid_Object.Rows[e.RowIndex].Cells[1].Value.ToString();
+			strParam = cGrid_Object.Rows[e.RowIndex].Cells[2].Value.ToString();
+			......
+		}
+
+		
+- 좌표 회전 변환하여 ellipse, rectangle 그리기 구조 
+	Left-top 지점의 회전 변환된 좌표
+		회전 변환시의 기준 center 지점은 ellipse draw의 center 지점이다.
+		
+	Left-top 지점의 회전 변환된 좌표를 구하고 이 좌표를 원점으로 지정하여 rotation 하면 ellipse가 제대로 그려질 것이다.
+		-> 구현 테스트 요함 -> 이것은 단지 화면에 보이기 위한 용도.
+
+		
+- 좌표 회전 변환 
+	[회전변환] 특정좌표를 중심으로 회전변환
+		http://scripter.egloos.com/1618411
+			-> 이것을 응용하여 화면 표시에 사용하면 되겠다.
+		rx, rx	// 회전된 좌표
+		px, py	// 원래 좌표
+		cx, cy	// 회전 중심점
+		rad		// 회전각도 라디안
+		
+		rx = (px - cx)*cos(rad) - (py - cy)*sin(rad) + cx;
+		ry = (px - cx)*sin(rad) + (py - cy)*cos(rad) + ry;
+	
+		sfPoint.X = (sfStartPoint.X - sfCenterPoint.X) * (float)Math.Cos(Radian(fAngle)) - (sfStartPoint.Y - sfCenterPoint.Y) * (float)Math.Sin(Radian(fAngle)) + sfCenterPoint.X;
+		sfPoint.Y = (sfStartPoint.X - sfCenterPoint.X) * (float)Math.Sin(Radian(fAngle)) + (sfStartPoint.Y - sfCenterPoint.Y) * (float)Math.Cos(Radian(fAngle)) + sfCenterPoint.Y;
+
+
+-  DatagridView (Full row select)
+	SelectionMode : FullRowSelect로 변경합니다. 
+
+
+- 델리게이트 
+	메소드를 참조하는 대리자.
+	이벤트 핸들러 델리게이트를 이용해 이벤트를 등록한다.
+		델리게이트 -> 델리게이트 및 이벤트
+		
+
+- GDI+ graphics 
+	CreateGraphics()로 생성한 Graphics 객체는 반드시 Dispose를 해야 한다.
+	using문을 사용하여 dispose가 자동으로 되도록 하는 것이 편리하다.
+	using(Graphics grfx = btn.CreateGraphics())
+	{
+		grfx.FillRectange(new SolidBrush(Color.Blue), this.ClientRectangle);
+	}
+
+- file open 
+	  string path = MainForm.cSystem.cDef.gSt_RecipePath_Pos + MainForm.cSystem.gstrCurrent_Recipe + "\\RoiImage_" + MainForm.cSystem.LD + ".bmp";
+	  if (File.Exists(path))
+	  {
+	      FileStream fs = new FileStream(path, FileMode.Open);
+	      Image tmpImage = new System.Drawing.Bitmap(fs);
+	      cPic_LoaderVision_TeachingImg.Image = tmpImage;
+	      fs.Close();
+	  }
+	
+	  lock (thislock)
+	  {
+	      FileStream fs = File.Open(strFileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+	      StreamWriter sw = new StreamWriter(fs);
+	      sw.WriteLine(strMsg);
+	      sw.Close();
+	      fs.Close();
+	  }
+
+
+- netDxf 
+	DxfDocument dxf = DxfDocument.Load("sample.dxf");
+
+	Console.WriteLine("ENTITIES:");
+	Console.WriteLine("     {0}; count: {1}", EntityType.Arc.ToString(), dxf.Arcs.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.Circle.ToString(), dxf.Circles.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.Dimension.ToString(), dxf.Dimensions.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.Ellipse.ToString(), dxf.Ellipses.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.Face3D.ToString(), dxf.Faces3d.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.Hatch.ToString(), dxf.Hatches.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.Image.ToString(), dxf.Images.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.Insert.ToString(), dxf.Inserts.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.LightWeightPolyline.ToString(), dxf.LwPolylines.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.Line.ToString(), dxf.Lines.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.MLine.ToString(), dxf.MLines.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.MText.ToString(), dxf.MTexts.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.Point.ToString(), dxf.Points.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.PolyfaceMesh.ToString(), dxf.PolyfaceMeshes.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.Polyline.ToString(), dxf.Polylines.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.Solid.ToString(), dxf.Solids.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.Spline.ToString(), dxf.Splines.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.Text.ToString(), dxf.Texts.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.Ray.ToString(), dxf.Rays.Count);
+	Console.WriteLine("     {0}; count: {1}", EntityType.XLine.ToString(), dxf.XLines.Count);
+	Console.WriteLine();
+
+	for (int i = 0; i < dxf.Lines.Count; i++)
+	{
+		strParam = string.Format("Start({1:N3},{2:N3}),End({3:N3},{4:N3})", i, dxf.Lines[i].StartPoint.X, dxf.Lines[i].StartPoint.Y, dxf.Lines[i].EndPoint.X, dxf.Lines[i].EndPoint.Y);
+	
+		Console.WriteLine("Line{0};Start({1},{2}),End({3},{4})", i, dxf.Lines[i].StartPoint.X, dxf.Lines[i].StartPoint.Y, dxf.Lines[i].EndPoint.X, dxf.Lines[i].EndPoint.Y);
+		
+		cSystem.scr_Sub.cGrid_Object.Rows.Add(i, "Lines", strParam);
+	
+		if (dxf.Lines[i].Color.IsByLayer)
+			g.DrawLine(new Pen(dxf.Lines[i].Layer.Color.ToColor(), 1), (float)dxf.Lines[i].StartPoint.X * fScale, (float)iBottom - (float)dxf.Lines[i].StartPoint.Y * fScale
+				, (float)dxf.Lines[i].EndPoint.X * fScale, (float)iBottom - (float)dxf.Lines[i].EndPoint.Y * fScale); // Layer Color
+		else
+			g.DrawLine(new Pen(dxf.Lines[i].Color.ToColor(), 1), (float)dxf.Lines[i].StartPoint.X * fScale, (float)iBottom - (float)dxf.Lines[i].StartPoint.Y * fScale
+				, (float)dxf.Lines[i].EndPoint.X * fScale, (float)iBottom - (float)dxf.Lines[i].EndPoint.Y * fScale); // Color
+	}
+
+
+- netDXF specification 
+	Version support
+		ac1027 (2013 dxf file format) -> 지원되지 않음. 
+		ac1024 (2010 dxf file format) -> 정상 지원됨.
+		ac1015 -> 정상 지원됨.
+
+	Arc 
+		Center, EndAngle, Radius, StartAngle
+
+	
+	
+- Ellipse draw 
+	Note)DrawEllipse는 단순히 rectagle 내부를 채우는 타원이다. 즉, rectangle에 내접하는 타원이다.
+	
+
+- Circle draw
+	// (float)iBottom - sfPoint.Y - fRadius * 2 // Y axis flip
+	if (dxf.Circles[i].Color.IsByLayer)
+	    g.DrawEllipse(new Pen(dxf.Circles[i].Layer.Color.ToColor(), 1), sfPoint.X, (float)iBottom - sfPoint.Y - fRadius * 2, fRadius * 2, fRadius * 2);
+		//g.DrawEllipse(new Pen(dxf.Circles[i].Layer.Color.ToColor(), 1), sfPoint.X, (float)iBottom - (float)dxf.Circles[i].Center.Y * fScale - (float)dxf.Circles[i].Radius * fScale, fRadius * 2, fRadius * 2);
+	else
+	    g.DrawEllipse(new Pen(dxf.Circles[i].Color.ToColor(), 1), sfPoint.X, (float)iBottom - sfPoint.Y - fRadius * 2, fRadius * 2, fRadius * 2);
+
+	float fRadius = (float)dxf.Circles[i].Radius * fScale;
+	SFPoint sfPoint;
+	sfPoint.Y = ((float)dxf.Circles[i].Center.Y - (float)dxf.Circles[i].Radius) * fScale;
+
+	// fLength test code (fLengthY1 = fLengthY2)
+	float fLengthY1 = (float)iBottom - sfPoint.Y - fRadius * 2;
+	//float fLengthY2 = (float)iBottom - (float)dxf.Circles[i].Center.Y * fScale - (float)dxf.Circles[i].Radius * fScale;
+	float fLengthY2 = (float)iBottom - ((float)dxf.Circles[i].Center.Y + (float)dxf.Circles[i].Radius) * fScale;
+	
+
+- 좌표 회전 변환
+		// Original drawing (Reference)
+		g2.DrawEllipse(Pens.Red, 0, 0, 200, 80);
+		g2.DrawRectangle(Pens.Red, 0, 0, 200, 80);
+		
+		// Set world transform of graphics object to translate.
+		g2.TranslateTransform(100.0F, 0.0F);		// 원점 설정
+		//g2.TranslateTransform(0.0F, 0.0F);
+		
+		// Then to rotate, prepending rotation matrix.
+		g2.RotateTransform(30.0F);							// 회전 변환
+		
+		// Draw rotated, translated ellipse to screen.
+		g2.DrawEllipse(Pens.Blue, 0, 0, 200, 80);
+		g2.DrawRectangle(Pens.Blue, 0, 0, 200, 80);
+		
+		// 변환 설정을 기존의 역순으로 하여 좌표축 상태를 원래대로 복원한다.
+		g2.RotateTransform(-30.0F);							// 회전 변환
+		g2.TranslateTransform(-100.0F, 0.0F);		// 원점 설정
+		
+		g2.DrawEllipse(Pens.Purple, 0, 0, 200, 80);
+		g2.DrawRectangle(Pens.Purple, 0, 0, 200, 80);
+
+
+- 타원 위의 점 구하기 (Parameter : Center X, Center Y, a length, b length, φ angle)
+	https://chodalho.wordpress.com/2010/03/19/%ED%83%80%EC%9B%90-%EC%9C%84%EC%9D%98-%EC%A0%90-%EA%B5%AC%ED%95%98%EA%B8%B0/
+		2010/03/19에 게시됨	작성자:  chodalho 	
+	
+	General parametric form
+	An ellipse in general position can be expressed parametrically as the path of a point (X(t),Y(t)), where
+	  X(t) = Xc + a*cos(t)*cos(phi) - b*sin(t)*sin(phi)
+	  Y(t) = Yc + a*cos(t)*sin(phi) + b*sin(t)*cos(phi)
+	as the parameter t varies from 0 to 2π. Here (Xc,Yc) is the center of the ellipse, 
+	and φ(phi) is the angle between the X-axis and the major axis of the ellipse.
+	t은 0~360까지의 라이안 값이고
+	φ은 x축과 타원의 장축의 각도이다. 즉 기울어진 정도라고 생각하면 된다. 
+	a, b는 장축, 단축의 반지름이다.
+	
+	참고로 
+	Parametric form in canonical position
+	For an ellipse in canonical position (center at origin, major axis along the X-axis), the equation simplifies to
+	  X(t) = a*cos(t) 
+	  Y(t) = b*sin(t) 
+	Note that the parameter t (called the eccentric anomaly in astronomy) is not the angle of (X(t),Y(t)) with the X-axis
+
+
+- string control (문자열)
+	http://skymong9.egloos.com/v/1402414
+		[C#] 문자열 작업에 대한 모든 것!
+		인덱스(Index)로 접근하기
+			string str = "가나다라마바사";
+			Response.Write( str[0] );
+			// 결과는 첫번째 문자인 '가' 출력	
+		문자열을 찾아서 문자열 자르기
+			전체 문자열에서 어떤 문자열을 찾아서, 그 검색된 문자열을 다음 공백까지 잘라내는 작업을 많이 합니다.
+			전문 용어로 이를 파싱(Parsing)이라고 부릅니다.
+			IndexOf( "검색할 문자열" );
+			LastIndexOf( "검색할 문자열" );
+			Substring( 자를 위치 첨자 );
+			Substring( 자를 위치 첨자, 첨자에서 자를 만큼의 길이 );
+		구분자 기준으로 문자열 자르기 (Split)
+			구분자를 기준으로 문자열을 분리시켜서 배열로 반환합니다.
+			string str = "가,나,다,라,마";
+			string [] result = str.Split(',');
+		문자열 치환하기
+			문자열 중 특정 문자를 다른 문자로 바꾸고 싶을때 Replace 가 사용됩니다. 특히 ASP.NET 에서 내용을 보여줄때 꼭 쓰입니다.
+			string str = "마음소프트\r\nC# 라이브러리";
+			str = str.Replace( "\r\n", "<br>" );
+			// 글 입력을 받을 때 textarea 내에서 엔터를 치면 /r/n 으로 데이터가 입력됩니다. (일명 Carriage return 과 New line)
+			// 그냥 출력해서 보여주면 내용이 라인 구분없이 계속 붙어 나옵니다.
+
+	string 포함(include) 여부 확인
+		string s1 = "The quick brown fox jumps over the lazy dog";  
+		string s2 = "fox";  
+		bool b;  
+		b = s1.Contains(s2);  
+		Console.WriteLine("Is the string, s2, in the string, s1?: {0}", b);  
+		출처: http://nolran.tistory.com/46 [맛집도 좋고 개발도 좋고~]
+
+	string strParam;
+	for (int i = 0; i < dxf.Lines.Count; i++)
+	{
+	    strParam = string.Format("Start({1},{2}),End({3},{4})", i, dxf.Lines[i].StartPoint.X, dxf.Lines[i].StartPoint.Y, dxf.Lines[i].EndPoint.X, dxf.Lines[i].EndPoint.Y);
+	}	
+	수치 Format display
+		strParam = string.Format("Start({1:N3},{2:N3}),End({3:N3},{4:N3})", i, dxf.Lines[i].StartPoint.X, dxf.Lines[i].StartPoint.Y, dxf.Lines[i].EndPoint.X, dxf.Lines[i].EndPoint.Y);
+
+
+- netDXF library
+	참조 추가를 통해 netDXF library(netDXF.dll)를 추가해야 한다.
+	
+	using netDxf;
+	using netDxf.Blocks;
+	using netDxf.Entities;
+	using netDxf.Header;
+	using netDxf.Objects;
+	using netDxf.Tables;
+	using Point = netDxf.Entities.Point;
+	
+	DxfDocument dxf = DxfDocument.Load("sample.dxf");
+	Console.WriteLine("FILE VERSION: {0}", dxf.DrawingVariables.AcadVer);
+	Console.WriteLine();
+	Console.WriteLine("FILE COMMENTS: {0}", dxf.Comments.Count);
+	
+	for (int i = 0; i < dxf.Lines.Count; i++)
+	{
+	    Console.WriteLine("Line{0};Start({1},{2}),End({3},{4})", i, dxf.Lines[i].StartPoint.X, dxf.Lines[i].StartPoint.Y, dxf.Lines[i].EndPoint.X, dxf.Lines[i].EndPoint.Y);
+	    //g.DrawLine(new Pen(Color.Black, 1), (float)dxf.Lines[i].StartPoint.X, (float)dxf.Lines[i].StartPoint.Y
+	    //    , (float)dxf.Lines[i].EndPoint.X, (float)dxf.Lines[i].EndPoint.Y);        // Original
+	
+	    //g.DrawLine(new Pen(Color.Black, 1), (float)dxf.Lines[i].StartPoint.X/2, (float)dxf.Lines[i].StartPoint.Y/2
+	    //    , (float)dxf.Lines[i].EndPoint.X/2, (float)dxf.Lines[i].EndPoint.Y/2);    // Scaling
+	
+	    //g.DrawLine(new Pen(Color.Black, 1), (float)dxf.Lines[i].StartPoint.X / 2, (float)iBottom - (float)dxf.Lines[i].StartPoint.Y / 2
+	    //    , (float)dxf.Lines[i].EndPoint.X / 2, (float)iBottom - (float)dxf.Lines[i].EndPoint.Y / 2); // Y flip
+	
+	    //g.DrawLine(new Pen(dxf.Lines[i].Color.ToColor(), 1), (float)dxf.Lines[i].StartPoint.X / 2, (float)iBottom - (float)dxf.Lines[i].StartPoint.Y / 2
+	    //    , (float)dxf.Lines[i].EndPoint.X / 2, (float)iBottom - (float)dxf.Lines[i].EndPoint.Y / 2); // Color
+	
+	    //g.DrawLine(new Pen(dxf.Lines[i].Layer.Color.ToColor(), 1), (float)dxf.Lines[i].StartPoint.X / 2, (float)iBottom - (float)dxf.Lines[i].StartPoint.Y / 2
+	    //    , (float)dxf.Lines[i].EndPoint.X / 2, (float)iBottom - (float)dxf.Lines[i].EndPoint.Y / 2); // Layer Color
+	
+	    if(dxf.Lines[i].Color.IsByLayer)
+	        g.DrawLine(new Pen(dxf.Lines[i].Layer.Color.ToColor(), 1), (float)dxf.Lines[i].StartPoint.X / 2, (float)iBottom - (float)dxf.Lines[i].StartPoint.Y / 2
+	            , (float)dxf.Lines[i].EndPoint.X / 2, (float)iBottom - (float)dxf.Lines[i].EndPoint.Y / 2); // Layer Color
+	    else
+	        g.DrawLine(new Pen(dxf.Lines[i].Color.ToColor(), 1), (float)dxf.Lines[i].StartPoint.X / 2, (float)iBottom - (float)dxf.Lines[i].StartPoint.Y / 2
+	            , (float)dxf.Lines[i].EndPoint.X / 2, (float)iBottom - (float)dxf.Lines[i].EndPoint.Y / 2); // Color
+	
+	}
+
+
+- RTC library
+	Mark command 
+		RTC circle, ellipse 함수 확인 -> 이런 함수는 없다. 유일하게 arc command만 추가되어 있다. 이것으로 circle까지는 쉽게 구현할 수 있을 것이다.
+
+	Marker
+		d:\Project\DooWon\RTC4_Software_2016-03-31\Disk\Windows\Utility Files\Visual C#\RTC4Wrap.cs
+		d:\Project\DooWon\RTC4_Software_2016-03-31\Disk\Demo Files\DEMO3.cs			// Console application demo
+
+	RTC component import.
+		Class 추가 및 using 만으로는 함수 인식이 되지 않고 있다. -> RTC4Wrap을 해 주어야 한다.
+
+    class Plotter : RTC4Wrap
+    {
+        // Desired Nd:YAG Laser Timing for YAG mode 1
+        const uint LASER = 10000;           // Laser pulse frequency in Hz.
+        const uint PULSE = 5;               // Pulse width in microseconds.
+        const uint PULSE1ST = 2;            // Amount of pulses the first
+				......
+		}
+
+	컴파일 에러는 없지만 예외 에러 발생. correction file load error.
+		-> Target deivce가 없어서 발생하는 에러가 아닌가?
+			RTC관련 DLL을 Debug folder로 복사시 치명적에러는 없이 에러코드를 반환한다. (에러코드 11)
+				throw new RTC4Exception(Msg);	// 이 부분에 대한 처리는 안 되고 있다. 추후 사용 요함.
+
+
+- 배열의 선언 및 사용 
+	DXFObject[] dxfObject = new DXFObject[100];
+	WriteDXFObject(dxfObject, 0);
+
+
+- #define 
+	#define RTC4
+		// using의 제일 위에 배치해야 한다.
+		그러면 C# 처럼 사용할 수 있다.
+		https://docs.microsoft.com/ko-kr/dotnet/csharp/language-reference/preprocessor-directives/preprocessor-define
+	#if RTC4 
+		......
+	#endif
+		
+	#define 대신 
+		#if true
+		....
+		#endif
+	사용.
+
+
+- Control 외부 제어
+	Scr_Sub.Designer.cs
+		public System.Windows.Forms.DataGridView cGrid_Object;	// private -> public change (외부에서 제어 가능하도록 변경)
